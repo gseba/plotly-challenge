@@ -1,33 +1,33 @@
 function buildMetadata(sample) {
 
+  // Use d3 to select the panel with id of `#sample-metadata`
+  var sample_metadata = d3.select("#sample-metadata");
+
   // @TODO: Complete the following function that builds the metadata panel
 
   // Use `d3.json` to fetch the metadata for a sample
-  var url = `/metadata/${sample}`;
-  d3.json(url).then(function(sample){
-    // Use d3 to select the panel with id of `#sample-metadata`
-    var sample_metadata = d3.select("#sample-metadata");
+  d3.json(`/metadata/${sample}`).then(function(sample) {
+    console.log(sample);
+
+    
 
     // Use `.html("") to clear any existing metadata
     sample_metadata.html("");
 
-
     // Use `Object.entries` to add each key and value pair to the panel
     // Hint: Inside the loop, you will need to use d3 to append new
     // tags for each key-value in the metadata.
-    Object.entries(sample).forEach(function ([key, value]) {
+    Object.entries(sample).forEach(function([key, value]) {
       var row = sample_metadata.append("p");
       row.text(`${key}: ${value}`);
-
+    })
 });
-  }
-)};
 
 function buildCharts(sample) {
 
   // @TODO: Use `d3.json` to fetch the sample data for the plots
-  var url = `/samples/${sample}`;
-  d3.json(url).then(function(data) {
+  d3.json(`/samples/${sample}`).then(function(data) {
+    console.log(data);
 
     // @TODO: Build a Bubble Chart using the sample data
     var x_values = data.otu_ids;
@@ -36,7 +36,7 @@ function buildCharts(sample) {
     var m_colors = data.otu_ids; 
     var t_values = data.otu_labels;
 
-    var trace1 = {
+    var bubbleData = {
       x: x_values,
       y: y_values,
       text: t_values,
@@ -47,29 +47,45 @@ function buildCharts(sample) {
       } 
     };
   
-    var data = [trace1];
-
-    var layout = {
+  
+    var bubbleLayout = {
       xaxis: { title: "OTU ID"},
     };
 
-    Plotly.newPlot('bubble', data, layout);
-   
+    Plotly.newPlot('bubble', bubbleData, bubbleLayout, {responsive: true});
 
     // @TODO: Build a Pie Chart
-    d3.json(url).then(function(data) {  
-    var pie_values = data.sample_values.slice(0,10);
+    // HINT: You will need to use slice() to grab the top 10 sample_values,
+    // otu_ids, and labels (10 each).
+    d3.json(`/samples/${sample}`).then(function(data) {
+      console.log(data);
+
+      var pie_values = data.sample_values.slice(0,10);
       var pie_labels = data.otu_ids.slice(0,10);
       var pie_hover = data.otu_labels.slice(0,10);
 
-      var data = [{
+      var pieData = [{
         values: pie_values,
-        labels: pie_labels,
-        hovertext: pie_hover,
-        type: 'pie'
+        labels: pie_labels,        
+        type: 'pie',
+        textposition: "inside",
+        hovertext: pie_hover
       }];
 
-      Plotly.newPlot('pie', data);
+      let pieLayout ={
+        title:"Belly Button Bubble Chart",
+        xaxis: {
+          title: 'OTU ID',
+        },
+        yaxis: {
+          title: 'Sample Value'
+        },
+        width:1100,
+        plot_bgcolor: 'rgba(0, 0, 0, 0)',
+        paper_bgcolor: 'rgba(0, 0, 0, 0)',
+      };
+
+      Plotly.newPlot('pie', pieData, pieLayout, {responsive: true});
 
     });
   });   
@@ -104,3 +120,4 @@ function optionChanged(newSample) {
 
 // Initialize the dashboard
 init();
+
