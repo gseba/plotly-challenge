@@ -22,6 +22,7 @@ function buildMetadata(sample) {
       row.text(`${key}: ${value}`);
     })
 });
+};
 
 function buildCharts(sample) {
 
@@ -36,19 +37,21 @@ function buildCharts(sample) {
     var m_colors = data.otu_ids; 
     var t_values = data.otu_labels;
 
-    var bubbleData = {
+    var bubbleData = [{
       x: x_values,
       y: y_values,
       text: t_values,
-      mode: 'markers',
+      mode: "markers",
       marker: {
         color: m_colors,
-        size: m_size
+        size: y_values
       } 
-    };
+    }];
   
   
     var bubbleLayout = {
+      margin: {t: 0},
+      hovermode: "closest",
       xaxis: { title: "OTU ID"},
     };
 
@@ -89,7 +92,7 @@ function buildCharts(sample) {
 
     });
   });   
-}
+};
 
 
 function init() {
@@ -120,4 +123,3 @@ function optionChanged(newSample) {
 
 // Initialize the dashboard
 init();
-
